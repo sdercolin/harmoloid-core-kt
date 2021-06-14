@@ -2,7 +2,9 @@ plugins {
     kotlin("multiplatform") version "1.5.10"
     kotlin("plugin.serialization") version "1.5.0"
     id("org.jlleitschuh.gradle.ktlint") version "9.4.1"
+    id("org.jetbrains.dokka") version "1.4.32"
     id("maven-publish")
+    id("signing")
 }
 
 group = "com.sdercolin.harmoloid"
@@ -14,6 +16,14 @@ repositories {
 
 configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
     version.set("0.36.0")
+}
+
+val dokkaHtml by tasks.getting(org.jetbrains.dokka.gradle.DokkaTask::class)
+
+val javadocJar: TaskProvider<Jar> by tasks.registering(Jar::class) {
+    dependsOn(dokkaHtml)
+    archiveClassifier.set("javadoc")
+    from(dokkaHtml.outputDirectory)
 }
 
 kotlin {
@@ -56,5 +66,51 @@ kotlin {
         val jsTest by getting
         val nativeMain by getting
         val nativeTest by getting
+    }
+}
+
+publishing {
+    publications.withType<MavenPublication> {
+        artifact(javadocJar)
+        pom {
+            name.set("harmoloid-core")
+            description.set("Core library for HARMOLOID built in Kotlin/Multiplatform.")
+            url.set("https://github.com/sdercolin/harmoloid-core-kt")
+            licenses {
+                license {
+                    name.set("The Apache License, Version 2.0")
+                    url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                }
+            }
+            developers {
+                developer {
+                    id.set("sdercolin")
+                    name.set("sdercolin")
+                    email.set("sder.colin@gmail.com")
+                }
+            }
+            scm {
+                connection.set("git@github.com:sdercolin/harmoloid-core-kt.git")
+                developerConnection.set("git@github.com:sdercolin/harmoloid-core-kt.git")
+                url.set("https://github.com/sdercolin/harmoloid-core-kt")
+            }
+        }
+    }
+    repositories {
+        maven {
+            val releasesRepoUrl = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+            val snapshotsRepoUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+            url = if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl
+            credentials {
+                username = properties["ossrhUsername"] as String
+                password = properties["ossrhPassword"] as String
+            }
+        }
+    }
+}
+
+signing {
+    publishing.publications.withType<MavenPublication> {
+        sign(this)
     }
 }
