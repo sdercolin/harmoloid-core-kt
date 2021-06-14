@@ -13,4 +13,5 @@ The [first version](https://github.com/sdercolin/HARMOLOID) `1.x` is built as a 
 This project is a Kotlin implementation of the core algorithm of HARMOLOID. It can be applied on any MIDI-like formats with external IO modules.
 
 ## License
+
 [Apache License, Version 2.0](https://github.com/sdercolin/harmoloid-core-kt/blob/main/LICENSE.md)
