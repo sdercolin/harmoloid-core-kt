@@ -1,3 +1,3 @@
-# harmoloid-core-kt
+# HARMOLOID Core Library
 
-Core library for HARMOLOID in Kotlin
+Core library for HARMOLOID written in Kotlin
