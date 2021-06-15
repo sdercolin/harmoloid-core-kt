@@ -17,19 +17,22 @@ data class Track(
     val isTonalityMarked get() = passages?.all { it.tonality != null } == true
     val notes get() = bars.flatMap { it.notes }
 
-    fun getNoteShifts(harmonicType: HarmonicType, config: Config): List<NoteShift> {
-        ensureValidPassageWithTonalityMarked()
-        return requirePassages().flatMap { it.getNoteShifts(harmonicType, config) }
+    /**
+     * Get a track copy with passage settings initialized
+     */
+    fun passagesInitialized(): Track {
+        val passages = listOf(Passage(0, bars.toList()))
+        return this.copy(passages = passages)
     }
 
-    fun passagesInitializedIfNeeded(): Track {
+    internal fun passagesInitializedIfNeeded(): Track {
         return if (passages == null) passagesInitialized()
         else this
     }
 
-    fun passagesInitialized(): Track {
-        val passages = listOf(Passage(0, bars.toList()))
-        return this.copy(passages = passages)
+    internal fun getNoteShifts(harmonicType: HarmonicType, config: Config): List<NoteShift> {
+        ensureValidPassageWithTonalityMarked()
+        return requirePassages().flatMap { it.getNoteShifts(harmonicType, config) }
     }
 
     internal fun applyPassageSettings(originPassages: List<Passage>): Track {

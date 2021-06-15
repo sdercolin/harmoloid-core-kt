@@ -1,6 +1,7 @@
 package com.sdercolin.harmoloid.core.model
 
 import com.sdercolin.harmoloid.core.Config
+import com.sdercolin.harmoloid.core.process.PassageTonalityAnalysisResult
 import com.sdercolin.harmoloid.core.util.sumByLong
 
 /**
@@ -15,8 +16,8 @@ data class Passage(
 ) {
     val number get() = index + 1
     val notes get() = bars.flatMap { it.notes }
-    internal val validLength get() = bars.sumByLong { it.validLength }
 
+    internal val validLength get() = bars.sumByLong { it.validLength }
     internal val isAtonal: Boolean? get() = tonalityCertainties?.isEmpty()
     internal val isCertain: Boolean?
         get() = when (tonalityCertainties?.count { it.value == TonalityCertainty.Certain }) {
@@ -25,6 +26,18 @@ data class Passage(
             1 -> true
             else -> throw Exception("Multiple certain tonalities found.")
         }
+
+    internal fun getAnalysisResult(): PassageTonalityAnalysisResult {
+        return when {
+            isCertain!! -> PassageTonalityAnalysisResult.Certain(tonality!!)
+            isAtonal!! -> PassageTonalityAnalysisResult.Unknown
+            else -> PassageTonalityAnalysisResult.SimilarlyCertain(
+                tonalityCertainties!!.entries
+                    .sortedByDescending { it.value }
+                    .map { it.key }
+            )
+        }
+    }
 
     internal fun getNoteShifts(harmonicType: HarmonicType, config: Config): List<NoteShift> {
         val tonality = tonality ?: throw Exception("Tonality has not been set")
@@ -75,7 +88,7 @@ data class Passage(
     }
 
     internal val clearedForAnalysis: Passage
-        get() = copy(tonalityCertainties = null, tonality = null)
+        get() = copy(tonality = null, tonalityCertainties = null)
 
     internal fun takeCertainTonality(): Passage =
         when {

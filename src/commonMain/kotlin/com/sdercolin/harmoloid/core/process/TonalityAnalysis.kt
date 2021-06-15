@@ -7,19 +7,29 @@ import com.sdercolin.harmoloid.core.model.Passage
 import com.sdercolin.harmoloid.core.model.Tonality
 import com.sdercolin.harmoloid.core.model.TonalityCertainty
 import com.sdercolin.harmoloid.core.model.Track
-import com.sdercolin.harmoloid.core.process.TonalityAnalysisResult.Failure
-import com.sdercolin.harmoloid.core.process.TonalityAnalysisResult.Success
+import com.sdercolin.harmoloid.core.process.TrackTonalityAnalysisResult.Failure
+import com.sdercolin.harmoloid.core.process.TrackTonalityAnalysisResult.Success
 import com.sdercolin.harmoloid.core.util.sumByLong
 import com.sdercolin.harmoloid.core.util.update
 
-sealed class TonalityAnalysisResult {
-    class Success(val track: Track) : TonalityAnalysisResult()
-    sealed class Failure : TonalityAnalysisResult() {
+sealed class TrackTonalityAnalysisResult {
+    data class Success(
+        val passages: List<Passage>,
+        val passageResults: List<PassageTonalityAnalysisResult>
+    ) : TrackTonalityAnalysisResult()
+
+    sealed class Failure : TrackTonalityAnalysisResult() {
         object TrackIsTooShort : Failure()
     }
 }
 
-internal fun analyzeTonalityAuto(track: Track, config: Config): TonalityAnalysisResult {
+sealed class PassageTonalityAnalysisResult {
+    data class Certain(val tonality: Tonality) : PassageTonalityAnalysisResult()
+    data class SimilarlyCertain(val tonalities: List<Tonality>) : PassageTonalityAnalysisResult()
+    object Unknown : PassageTonalityAnalysisResult()
+}
+
+internal fun analyzeTonalityAuto(track: Track, config: Config): TrackTonalityAnalysisResult {
     val bars = track.bars
     val barTotal = bars.count()
     var passages = listOf<Passage>()
@@ -95,15 +105,15 @@ internal fun analyzeTonalityAuto(track: Track, config: Config): TonalityAnalysis
 
     // Save certain results
     passages = passages.map { it.takeCertainTonality() }
-    return Success(track.copy(passages = passages))
+    return Success(passages, passages.map { it.getAnalysisResult() })
 }
 
-internal fun analyzeTonalitySemiAuto(track: Track, config: Config): TonalityAnalysisResult {
+internal fun analyzeTonalitySemiAuto(track: Track, config: Config): TrackTonalityAnalysisResult {
     var passages = track.passages ?: track.passagesInitialized().passages!!
     passages = passages
         .map { it.estimateTonality(config) }
         .map { it.takeCertainTonality() }
-    return Success(track.copy(passages = passages))
+    return Success(passages, passages.map { it.getAnalysisResult() })
 }
 
 private fun Passage.estimateTonality(config: Config): Passage {

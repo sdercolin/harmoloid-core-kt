@@ -2,9 +2,10 @@ package com.sdercolin.harmoloid.core
 
 import com.sdercolin.harmoloid.core.model.Content
 import com.sdercolin.harmoloid.core.model.HarmonicType
+import com.sdercolin.harmoloid.core.model.NoteShift
 import com.sdercolin.harmoloid.core.model.Passage
 import com.sdercolin.harmoloid.core.model.Track
-import com.sdercolin.harmoloid.core.process.TonalityAnalysisResult
+import com.sdercolin.harmoloid.core.process.TrackTonalityAnalysisResult
 import com.sdercolin.harmoloid.core.process.analyzeTonalityAuto
 import com.sdercolin.harmoloid.core.process.analyzeTonalitySemiAuto
 
@@ -12,6 +13,7 @@ import com.sdercolin.harmoloid.core.process.analyzeTonalitySemiAuto
  * Main class for com.sdercolin.harmoloid.core process of HARMOLOID
  */
 class Core(content: Content, config: Config? = null) {
+    constructor(tracks: List<Track>, config: Config? = null) : this(Content(tracks), config)
 
     /**
      * Current state of project
@@ -54,17 +56,17 @@ class Core(content: Content, config: Config? = null) {
 
     /**
      * Automatically calculate passages division and tonalities
-     * @return certain failure happened or `null` if everything is ok
+     * @param trackIndex index of the track to be processed
      */
-    fun setPassagesAuto(trackIndex: Int): TonalityAnalysisResult.Failure? =
+    fun setPassagesAuto(trackIndex: Int): TrackTonalityAnalysisResult =
         setPassagesAutoOrSemiAuto(isFullAuto = true, trackIndex)
 
     /**
      * Calculate every passage that has been divided
+     * @param trackIndex index of the track to be processed
      * @param passages divided passages, but the tonality settings will be ignored
-     * @return certain failure happened or `null` if everything is ok
      */
-    fun setPassagesSemiAuto(trackIndex: Int, passages: List<Passage>): TonalityAnalysisResult.Failure? {
+    fun setPassagesSemiAuto(trackIndex: Int, passages: List<Passage>): TrackTonalityAnalysisResult {
         updateTrack(trackIndex) { track ->
             track.copy(passages = passages.map { it.clearedForAnalysis })
         }
@@ -74,6 +76,7 @@ class Core(content: Content, config: Config? = null) {
     /**
      * Save passage settings.
      * Call this function before exiting passage edition
+     * @param trackIndex index of the track to be processed
      * @return true if all passages are marked with tonality
      */
     fun savePassages(trackIndex: Int, passages: List<Passage>): Boolean {
@@ -83,29 +86,38 @@ class Core(content: Content, config: Config? = null) {
 
     /**
      * Save harmonic settings
+     * @param trackIndex index of the track to be processed
+     * @param harmonicTypes types of chorus that you need to generate on this track
      */
-    fun saveHarmonics(trackIndex: Int, harmonicTypes: Set<HarmonicType>) {
+    fun saveHarmonicTypes(trackIndex: Int, harmonicTypes: Set<HarmonicType>) {
         updateTrack(trackIndex) { track -> track.copy(harmonies = harmonicTypes.sortedBy { it.ordinal }.toSet()) }
+    }
+
+    /**
+     * Get a map of generated chorus from a track with harmonic type as the key.
+     * Make sure the track has been setup with tonality,
+     * otherwise an exception will be thrown
+     * @param trackIndex index of the track to be processed
+     */
+    fun getAllChorusTracks(trackIndex: Int): Map<HarmonicType, List<NoteShift>> {
+        val track = getTrack(trackIndex)
+        return track.harmonies.orEmpty().map {
+            it to track.getNoteShifts(it, config)
+        }.toMap()
     }
 
     private fun setPassagesAutoOrSemiAuto(
         isFullAuto: Boolean,
         trackIndex: Int
-    ): TonalityAnalysisResult.Failure? {
-        var maybeFailure: TonalityAnalysisResult.Failure? = null
-        updateTrack(trackIndex) {
-            val result =
-                if (isFullAuto) analyzeTonalityAuto(it, config)
-                else analyzeTonalitySemiAuto(it, config)
-            when (result) {
-                is TonalityAnalysisResult.Success -> result.track
-                is TonalityAnalysisResult.Failure -> {
-                    maybeFailure = result
-                    it
-                }
-            }
+    ): TrackTonalityAnalysisResult {
+        val track = getTrack(trackIndex)
+        val result = if (isFullAuto) analyzeTonalityAuto(track, config) else analyzeTonalitySemiAuto(track, config)
+        val newTrack = when (result) {
+            is TrackTonalityAnalysisResult.Success -> track.copy(passages = result.passages)
+            is TrackTonalityAnalysisResult.Failure -> track
         }
-        return maybeFailure
+        updateTrack(trackIndex) { newTrack }
+        return result
     }
 
     private fun getTrack(trackIndex: Int) = content.getTrack(trackIndex)
