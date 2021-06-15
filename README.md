@@ -74,10 +74,10 @@ val config = Config(
     keyShiftForLowerThirdHarmony = Config.keyShiftForLowerThirdHarmonyStandard
 )
 
-// pass config to constructor
+// Pass config to constructor
 val core = Core(content, config)
 
-// or reload config later
+// Or reload config later
 core.reloadConfig(config)
 
 ```
