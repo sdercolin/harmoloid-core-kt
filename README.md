@@ -135,7 +135,7 @@ core.saveHarmonics(trackIndex, setOf(HarmonicType.UpperThird, HarmonicType.Lower
 for (harmony in track.harmonies) {
     val noteShifts = track.getNoteShifts(harmony, core.config).map { it.id to it.keyDelta }.toMap()
     
-    // Do you output work with the note shifts
+    // Do your output work with the note shifts
     // The following code is an example with a pseudo NoteElement model
     val shiftedNoteElements = noteElements.mapNotNull {
         val keyDelta = noteShifts[it.index]
