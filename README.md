@@ -1,6 +1,6 @@
 # HARMOLOID Core
 
-[![Maven Central](https://img.shields.io/maven-central/v/com.sdercolin.harmoloid/harmoloid-core/1.1)](https://search.maven.org/artifact/com.sdercolin.harmoloid/harmoloid-core/1.0/pom)
+[![Maven Central](https://img.shields.io/maven-central/v/com.sdercolin.harmoloid/harmoloid-core/1.1)](https://search.maven.org/artifact/com.sdercolin.harmoloid/harmoloid-core/1.1/pom)
 
 Core library for HARMOLOID built in Kotlin/Multiplatform.
 
