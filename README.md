@@ -36,7 +36,7 @@ repositories {
 }
 
 dependencies {
-    implementation("com.sdercolin.harmoloid:harmoloid-core:x.y")
+    implementation("com.sdercolin.harmoloid:harmoloid-core:1.1")
 }
 ```
 
@@ -48,7 +48,7 @@ repositories {
 }
 
 dependencies {
-    implementation "com.sdercolin.harmoloid:harmoloid-core:x.y"
+    implementation "com.sdercolin.harmoloid:harmoloid-core:1.1"
 }
 ```
 
