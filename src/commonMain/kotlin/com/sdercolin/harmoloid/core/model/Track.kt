@@ -4,7 +4,7 @@ import com.sdercolin.harmoloid.core.Config
 import com.sdercolin.harmoloid.core.process.buildBars
 
 /**
- * A original track in the project
+ * An original track in the project
  */
 data class Track(
     val index: Int,

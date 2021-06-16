@@ -1,7 +1,6 @@
 package com.sdercolin.harmoloid.core.model
 
 import com.sdercolin.harmoloid.core.Config
-import com.sdercolin.harmoloid.core.process.PassageTonalityAnalysisResult
 import com.sdercolin.harmoloid.core.util.sumByLong
 
 /**

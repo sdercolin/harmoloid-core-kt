@@ -7,27 +7,9 @@ import com.sdercolin.harmoloid.core.model.Passage
 import com.sdercolin.harmoloid.core.model.Tonality
 import com.sdercolin.harmoloid.core.model.TonalityCertainty
 import com.sdercolin.harmoloid.core.model.Track
-import com.sdercolin.harmoloid.core.process.TrackTonalityAnalysisResult.Failure
-import com.sdercolin.harmoloid.core.process.TrackTonalityAnalysisResult.Success
+import com.sdercolin.harmoloid.core.model.TrackTonalityAnalysisResult
 import com.sdercolin.harmoloid.core.util.sumByLong
 import com.sdercolin.harmoloid.core.util.update
-
-sealed class TrackTonalityAnalysisResult {
-    data class Success(
-        val passages: List<Passage>,
-        val passageResults: List<PassageTonalityAnalysisResult>
-    ) : TrackTonalityAnalysisResult()
-
-    sealed class Failure : TrackTonalityAnalysisResult() {
-        object TrackIsTooShort : Failure()
-    }
-}
-
-sealed class PassageTonalityAnalysisResult {
-    data class Certain(val tonality: Tonality) : PassageTonalityAnalysisResult()
-    data class SimilarlyCertain(val tonalities: List<Tonality>) : PassageTonalityAnalysisResult()
-    object Unknown : PassageTonalityAnalysisResult()
-}
 
 internal fun analyzeTonalityAuto(track: Track, config: Config): TrackTonalityAnalysisResult {
     val bars = track.bars
@@ -59,7 +41,7 @@ internal fun analyzeTonalityAuto(track: Track, config: Config): TrackTonalityAna
             barPos++
         }
         if (barPos + minBarCount - 1 >= barTotal) {
-            return Failure.TrackIsTooShort
+            return TrackTonalityAnalysisResult.Failure.TrackIsTooShort
         }
         barPos += minBarCount - 1
         lastBarIndex = barPos
@@ -105,7 +87,7 @@ internal fun analyzeTonalityAuto(track: Track, config: Config): TrackTonalityAna
 
     // Save certain results
     passages = passages.map { it.takeCertainTonality() }
-    return Success(passages, passages.map { it.getAnalysisResult() })
+    return TrackTonalityAnalysisResult.Success(passages, passages.map { it.getAnalysisResult() })
 }
 
 internal fun analyzeTonalitySemiAuto(track: Track, config: Config): TrackTonalityAnalysisResult {
@@ -113,7 +95,7 @@ internal fun analyzeTonalitySemiAuto(track: Track, config: Config): TrackTonalit
     passages = passages
         .map { it.estimateTonality(config) }
         .map { it.takeCertainTonality() }
-    return Success(passages, passages.map { it.getAnalysisResult() })
+    return TrackTonalityAnalysisResult.Success(passages, passages.map { it.getAnalysisResult() })
 }
 
 private fun Passage.estimateTonality(config: Config): Passage {

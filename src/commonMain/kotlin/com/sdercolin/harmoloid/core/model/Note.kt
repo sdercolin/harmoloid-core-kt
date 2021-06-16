@@ -1,5 +1,8 @@
 package com.sdercolin.harmoloid.core.model
 
+/**
+ * Basic data of a note required for process
+ */
 data class Note(
     val index: Int,
     val key: Int,

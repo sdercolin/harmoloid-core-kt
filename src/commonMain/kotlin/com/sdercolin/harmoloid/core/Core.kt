@@ -5,7 +5,7 @@ import com.sdercolin.harmoloid.core.model.HarmonicType
 import com.sdercolin.harmoloid.core.model.NoteShift
 import com.sdercolin.harmoloid.core.model.Passage
 import com.sdercolin.harmoloid.core.model.Track
-import com.sdercolin.harmoloid.core.process.TrackTonalityAnalysisResult
+import com.sdercolin.harmoloid.core.model.TrackTonalityAnalysisResult
 import com.sdercolin.harmoloid.core.process.analyzeTonalityAuto
 import com.sdercolin.harmoloid.core.process.analyzeTonalitySemiAuto
 
