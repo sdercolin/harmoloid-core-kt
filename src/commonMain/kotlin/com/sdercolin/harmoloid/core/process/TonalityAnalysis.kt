@@ -218,7 +218,7 @@ private fun Bar.estimateIfBelongToPassage(passage: Passage, config: Config): Boo
     }
 }
 
-private fun List<Int>.bumpUpSolfege() = map { (it + 1) % 12 }.sorted()
+private fun Set<Int>.bumpUpSolfege() = map { (it + 1) % 12 }.sorted().toSet()
 
 private fun Bar.isValid(config: Config) =
     validLength.toDouble() / length >= config.minLengthRatioOfNoteForValidBar

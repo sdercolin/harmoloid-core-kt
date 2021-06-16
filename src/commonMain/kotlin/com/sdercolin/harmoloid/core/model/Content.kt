@@ -1,5 +1,7 @@
 package com.sdercolin.harmoloid.core.model
 
+import com.sdercolin.harmoloid.core.exception.InvalidTrackIndexesException
+import com.sdercolin.harmoloid.core.exception.TrackNotExistingException
 import com.sdercolin.harmoloid.core.util.update
 
 /**
@@ -9,7 +11,7 @@ data class Content(
     val tracks: List<Track>
 ) {
     fun getTrack(index: Int): Track {
-        return tracks.getOrNull(index) ?: throw Exception("Illegal track index $index")
+        return tracks.getOrNull(index) ?: throw TrackNotExistingException(index)
     }
 
     internal fun updateTrack(index: Int, updater: (Track) -> Track): Content {
@@ -20,4 +22,13 @@ data class Content(
     internal fun initializePassagesIfNeeded() = copy(
         tracks = tracks.map { it.passagesInitializedIfNeeded() }
     )
+
+    internal fun ensureValid(): Content {
+        val trackIndexes = tracks.map { it.index }
+        if (trackIndexes != tracks.indices.toList()) {
+            throw InvalidTrackIndexesException(trackIndexes)
+        }
+        tracks.forEach { it.ensureValid() }
+        return this
+    }
 }

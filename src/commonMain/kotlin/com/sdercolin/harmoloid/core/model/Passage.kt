@@ -6,6 +6,8 @@ import com.sdercolin.harmoloid.core.util.sumByLong
 /**
  * A range of bars which has a same tonality.
  * A passage is the smallest unit for tonality analysis or harmony calculation
+ * @param tonalityCertainties Show result of a tonality analysis. Do not set this parameter manually.
+ * @param tonality Can be set by tonality analysis or manually.
  */
 data class Passage(
     val index: Int,
@@ -21,9 +23,8 @@ data class Passage(
     internal val isCertain: Boolean?
         get() = when (tonalityCertainties?.count { it.value == TonalityCertainty.Certain }) {
             null -> null
-            0 -> false
             1 -> true
-            else -> throw Exception("Multiple certain tonalities found.")
+            else -> false
         }
 
     internal fun getAnalysisResult(): PassageTonalityAnalysisResult {
@@ -39,7 +40,7 @@ data class Passage(
     }
 
     internal fun getNoteShifts(harmonicType: HarmonicType, config: Config): List<NoteShift> {
-        val tonality = tonality ?: throw Exception("Tonality has not been set")
+        val tonality = requireNotNull(tonality)
         if (tonality.isMelodic.not()) return listOf()
         return when (harmonicType) {
             HarmonicType.Copy -> {

@@ -1,5 +1,6 @@
 package com.sdercolin.harmoloid.core.model
 
+import com.sdercolin.harmoloid.core.exception.InvalidBarException
 import com.sdercolin.harmoloid.core.util.sumByLong
 
 /**
@@ -16,4 +17,10 @@ data class Bar(
     val length get() = tickOff - tickOn
     val isEmpty get() = notes.isEmpty()
     internal val validLength get() = notes.sumByLong { it.length }
+
+    internal fun ensureValid(trackIndex: Int) {
+        if (length <= 0) {
+            throw InvalidBarException.InvalidLength(trackIndex, this)
+        }
+    }
 }

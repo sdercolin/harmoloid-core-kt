@@ -5,11 +5,12 @@ import com.sdercolin.harmoloid.core.model.Note
 import com.sdercolin.harmoloid.core.model.TimeSignature
 
 internal fun buildBars(notes: List<Note>, timeSignatures: List<TimeSignature>): List<Bar> {
+    val sortedTimeSignatures = timeSignatures.distinctBy { it.measurePosition }.sortedBy { it.measurePosition }
     val lastTick = notes.lastOrNull()?.tickOff ?: return emptyList()
-    val timeSignatureAtInfinity = timeSignatures.last().copy(measurePosition = Int.MAX_VALUE)
+    val timeSignatureAtInfinity = sortedTimeSignatures.last().copy(measurePosition = Int.MAX_VALUE)
 
     val barRanges = mutableListOf<IntRange>()
-    for (timeSignaturePair in timeSignatures.plus(timeSignatureAtInfinity).zipWithNext()) {
+    for (timeSignaturePair in sortedTimeSignatures.plus(timeSignatureAtInfinity).zipWithNext()) {
         val (thisTimeSignature, nextTimeSignature) = timeSignaturePair
 
         while (true) {

@@ -1,5 +1,6 @@
 package com.sdercolin.harmoloid.core
 
+import com.sdercolin.harmoloid.core.exception.PassageTonalityNotMarkedException
 import com.sdercolin.harmoloid.core.model.Content
 import com.sdercolin.harmoloid.core.model.HarmonicType
 import com.sdercolin.harmoloid.core.model.NoteShift
@@ -18,27 +19,27 @@ class Core(content: Content, config: Config? = null) {
     /**
      * Current state of project
      */
-    var content: Content = content.initializePassagesIfNeeded()
+    var content: Content = content.ensureValid().initializePassagesIfNeeded()
         private set
 
     /**
      * Current config being used
      */
-    var config: Config = config ?: Config()
+    var config: Config = config?.ensureValid() ?: Config()
         private set
 
     /**
      * Load a new project
      */
     fun load(content: Content) {
-        this.content = content.initializePassagesIfNeeded()
+        this.content = content.ensureValid().initializePassagesIfNeeded()
     }
 
     /**
      * Reload a config
      */
     fun reloadConfig(config: Config = Config()) {
-        this.config = config
+        this.config = config.ensureValid()
     }
 
     /**
@@ -46,7 +47,7 @@ class Core(content: Content, config: Config? = null) {
      * @param trackIndex index of the track to be copied
      */
     fun copyPassageSettingsToAllTracks(trackIndex: Int) {
-        val passages = getTrack(trackIndex).passages!!
+        val passages = getTrack(trackIndex).requirePassages()
         content.tracks.indices.minus(trackIndex).forEach { index ->
             updateTrack(index) { track ->
                 track.applyPassageSettings(passages)
@@ -96,7 +97,7 @@ class Core(content: Content, config: Config? = null) {
     /**
      * Get a map of generated chorus from a track with harmonic type as the key.
      * Make sure the track has been setup with tonality,
-     * otherwise an exception will be thrown
+     * otherwise a [PassageTonalityNotMarkedException] will be thrown
      * @param trackIndex index of the track to be processed
      */
     fun getAllChorusTracks(trackIndex: Int): Map<HarmonicType, List<NoteShift>> {
