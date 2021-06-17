@@ -6,7 +6,7 @@ Core library for HARMOLOID built in Kotlin/Multiplatform.
 
 ## What is HARMOLOID?
 
-HARMOLOID is an application for generating simple chorus based on projects of singing voice synthesizer softwares.
+HARMOLOID is an application for generating simple chorus based on projects of singing voice synthesizers.
 
 The [first version](https://github.com/sdercolin/HARMOLOID) `1.x` is built as a WinForm application, and a new web
 application is being developed now.
