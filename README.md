@@ -1,6 +1,6 @@
 # HARMOLOID Core
 
-[![Maven Central](https://img.shields.io/maven-central/v/com.sdercolin.harmoloid/harmoloid-core/1.1)](https://search.maven.org/artifact/com.sdercolin.harmoloid/harmoloid-core/1.1/pom)
+[![Maven Central](https://img.shields.io/maven-central/v/com.sdercolin.harmoloid/harmoloid-core/1.2)](https://search.maven.org/artifact/com.sdercolin.harmoloid/harmoloid-core/1.2/pom)
 
 Core library for HARMOLOID built in [Kotlin Multiplatform](https://kotlinlang.org/docs/mpp-intro.html).
 
@@ -35,7 +35,7 @@ repositories {
 }
 
 dependencies {
-    implementation("com.sdercolin.harmoloid:harmoloid-core:1.1")
+    implementation("com.sdercolin.harmoloid:harmoloid-core:1.2")
 }
 ```
 
@@ -47,7 +47,7 @@ repositories {
 }
 
 dependencies {
-    implementation "com.sdercolin.harmoloid:harmoloid-core:1.1"
+    implementation "com.sdercolin.harmoloid:harmoloid-core:1.2"
 }
 ```
 
