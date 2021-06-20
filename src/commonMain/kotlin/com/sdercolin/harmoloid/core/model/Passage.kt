@@ -19,18 +19,14 @@ data class Passage(
     val notes get() = bars.flatMap { it.notes }
 
     internal val validLength get() = bars.sumByLong { it.validLength }
-    internal val isAtonal: Boolean? get() = tonalityCertainties?.isEmpty()
-    internal val isCertain: Boolean?
-        get() = when (tonalityCertainties?.count { it.value == TonalityCertainty.Certain }) {
-            null -> null
-            1 -> true
-            else -> false
-        }
+    internal val isAtonal: Boolean get() = tonalityCertainties?.isEmpty() != false
+    internal val isCertain: Boolean
+        get() = tonalityCertainties?.count { it.value == TonalityCertainty.Certain } == 1
 
     internal fun getAnalysisResult(): PassageTonalityAnalysisResult {
         return when {
-            isCertain!! -> PassageTonalityAnalysisResult.Certain(tonality!!)
-            isAtonal!! -> PassageTonalityAnalysisResult.Unknown
+            isCertain -> PassageTonalityAnalysisResult.Certain(tonality!!)
+            isAtonal -> PassageTonalityAnalysisResult.Unknown
             else -> PassageTonalityAnalysisResult.SimilarlyCertain(
                 tonalityCertainties!!.entries
                     .sortedByDescending { it.value }
@@ -92,10 +88,10 @@ data class Passage(
 
     internal fun takeCertainTonality(): Passage =
         when {
-            isCertain!! -> copy(
+            isCertain -> copy(
                 tonality = tonalityCertainties!!.entries.find { it.value == TonalityCertainty.Certain }!!.key
             )
-            isAtonal!! -> copy(tonality = Tonality.Atonal)
+            isAtonal -> copy(tonality = Tonality.Atonal)
             else -> this
         }
 }

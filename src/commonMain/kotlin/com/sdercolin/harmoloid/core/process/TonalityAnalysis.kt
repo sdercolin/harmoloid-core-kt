@@ -182,7 +182,7 @@ private fun Passage.estimateTonality(config: Config): Passage {
 private fun Bar.estimateIfBelongToPassage(passage: Passage, config: Config): Boolean {
     if (isEmpty) return true
     if (!isValid(config)) return true
-    if (passage.isAtonal!!) return true
+    if (passage.isAtonal) return true
 
     val totalLength = validLength
     val solfegePercentages = MutableList(KEY_IN_OCTAVE) { solfege ->
@@ -192,7 +192,7 @@ private fun Bar.estimateIfBelongToPassage(passage: Passage, config: Config): Boo
         lengthForThisSolfege.toDouble() / totalLength
     }
 
-    if (passage.isCertain!!) {
+    if (passage.isCertain) {
         val passageTonality = passage.takeCertainTonality().tonality!!
         var probability = 0.0
         var validSolfegeSyllables = config.validSolfegeSyllablesInOctave
@@ -207,7 +207,7 @@ private fun Bar.estimateIfBelongToPassage(passage: Passage, config: Config): Boo
         var validSolfegeSyllables = config.validSolfegeSyllablesInOctave
         for (tonality in Tonality.values()) {
             if (tonality.ordinal != 0) validSolfegeSyllables = validSolfegeSyllables.bumpUpSolfege()
-            passage.tonalityCertainties!![tonality] ?: continue
+            passage.tonalityCertainties.orEmpty()[tonality] ?: continue
             var probability = 0.0
             for (solfege in validSolfegeSyllables) {
                 probability += solfegePercentages[solfege]
