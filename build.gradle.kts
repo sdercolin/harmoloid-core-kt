@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "com.sdercolin.harmoloid"
-version = "1.2"
+version = "1.3-SNAPSHOT"
 
 repositories {
     mavenCentral()
