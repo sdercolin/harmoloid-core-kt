@@ -47,10 +47,14 @@ data class Track(
 
     internal fun applyPassageSettings(passagesFromOther: List<Passage>): Track {
         val passages = passagesFromOther.mapNotNull { passageFromOther ->
-            val barIndexesFromOther = passageFromOther.bars.map { it.index }
+            val barIndexesFromOther = passageFromOther.bars.map { it.index }.toSet()
             val barIndexes = this.bars.indices.intersect(barIndexesFromOther)
                 .takeUnless { it.isEmpty() } ?: return@mapNotNull null
-            val bars = this.bars.subList(barIndexes.first(), barIndexes.last() + 1)
+            val bars = if (passagesFromOther.indexOf(passageFromOther) == passagesFromOther.lastIndex) {
+                this.bars.subList(barIndexes.first(), this.bars.size)
+            } else {
+                this.bars.subList(barIndexes.first(), barIndexes.last() + 1)
+            }
             passageFromOther.copy(bars = bars)
         }
         return copy(passages = passages.mapIndexed { index, passage ->
